@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"
+import DevMenu from "../components/DevMenu";
 
 const roles = [
     {
@@ -61,11 +62,8 @@ const RoleSelectionPage = () => {
 
     return (
         <main className="min-h-screen bg-gradient-to-b from-slate-50 to-teal-50 px-4 py-5">
-            <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
-                <p className="text-sm font-bold text-teal-700">FLEETflow</p>
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-amber-300 bg-amber-100 text-xs text-amber-700">
-                    !
-                </span>
+            <div className="mx-auto flex w-full max-w-6xl items-center justify-end">
+                <DevMenu />
             </div>
 
             <section className="mx-auto mt-20 w-full max-w-4xl">
