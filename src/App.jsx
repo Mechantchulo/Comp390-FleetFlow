@@ -1,25 +1,54 @@
-import { Routes, Route } from "react-router-dom"
+import { Link, Route, Routes } from "react-router-dom";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
-import LoginPage from "./pages/LoginPage"
-import SignUpPage from "./pages/SignUpPage"
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
 
-function DashboardPlaceholder() {
+function Placeholder({ title }) {
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center">
       <h1 className="text-2xl font-semibold text-slate-800">
-        Dashboard placeholder
+        {title}
       </h1>
     </main>
   );
 }
 
 export default function App() {
-  return(
-    <Routes>
-      <Route path="/" element={<RoleSelectionPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignUpPage />} />
-      <Route path="/dashboard" element={<DashboardPlaceholder />} />
-    </Routes>
-  )
+  return (
+    <>
+      <Link
+        to="/"
+        aria-label="Go to welcome page"
+        className="fixed left-6 top-6 z-50 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white/80 px-3 py-2 text-teal-700 shadow-sm backdrop-blur-sm hover:bg-white"
+      >
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-teal-100 text-sm">
+          🚚
+        </span>
+        <span className="text-sm font-bold">FLEETflow</span>
+      </Link>
+
+      <Routes>
+        <Route path="/" element={<RoleSelectionPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+
+        <Route
+          path="/dashboard/transport_manager"
+          element={<Placeholder title="Transport Manager Dashboard (WIP)" />}
+        />
+        <Route
+          path="/dashboard/operations_staff"
+          element={<Placeholder title="Operations Staff Dashboard (WIP)" />}
+        />
+        <Route
+          path="/dashboard/department_dean"
+          element={<Placeholder title="Department Dean Dashboard (WIP)" />}
+        />
+        <Route
+          path="/dashboard/fleet_driver"
+          element={<Placeholder title="Fleet Driver Dashboard (WIP)" />}
+        />
+      </Routes>
+    </>
+  );
 }
