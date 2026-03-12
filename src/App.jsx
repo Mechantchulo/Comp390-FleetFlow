@@ -2,7 +2,8 @@ import { Link, Route, Routes } from "react-router-dom";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-
+import DeanDashboard from "./pages/dean/DeanDashboard"
+import StaffDashboard from "./pages/staff/StaffDashboard";
 function Placeholder({ title }) {
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -36,14 +37,10 @@ export default function App() {
           path="/dashboard/transport_manager"
           element={<Placeholder title="Transport Manager Dashboard (WIP)" />}
         />
-        <Route
-          path="/dashboard/operations_staff"
-          element={<Placeholder title="Operations Staff Dashboard (WIP)" />}
-        />
-        <Route
-          path="/dashboard/department_dean"
-          element={<Placeholder title="Department Dean Dashboard (WIP)" />}
-        />
+        <Route path="/dashboard/operations_staff" element={<StaffDashboard />} />
+
+
+        <Route path="/dashboard/department_dean" element={<DeanDashboard />} />
         <Route
           path="/dashboard/fleet_driver"
           element={<Placeholder title="Fleet Driver Dashboard (WIP)" />}
