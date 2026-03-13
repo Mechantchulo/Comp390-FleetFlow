@@ -7,8 +7,7 @@ const Profile = () => {
     gender: "Female",
     phone: "+254...",
     email: "meggy@egerton.ac.ke",
-    staffId: "EF123/2026",
-    faculty: "Science"
+    staffId: "EF123/2026"
   });
 
   // Get first letter of first name
@@ -61,25 +60,13 @@ const Profile = () => {
             <p className="font-medium">{user.staffId}</p>
           </div>
 
-          <div>
-            <p className="text-gray-400">Faculty</p>
-            <p className="font-medium">{user.faculty}</p>
-          </div>
-
         </div>
 
 
         {/* ACTION BUTTONS */}
-        <div className="flex gap-4 mt-8">
-
-          <button className="bg-[#2A9D8F] text-white px-5 py-2 rounded-lg hover:bg-teal-700">
-            Edit Profile
-          </button>
-
-          <button className="bg-[#E6F4F1] text-[#2A9D8F] px-5 py-2 rounded-lg hover:bg-teal-100">
+        <div>  <button className="bg-[#E6F4F1] text-[#2A9D8F] px-5 py-2 rounded-lg hover:bg-teal-100">
             Change Password
           </button>
-
         </div>
 
       </div>
