@@ -45,7 +45,7 @@ const PendingRequests = () => {
               <th className="pb-4">REQUESTER</th>
               <th className="pb-4">PURPOSE</th>
               <th className="pb-4">DATE & DEST.</th>
-              <th className="pb-4">PAX</th>
+              <th className="pb-4">POB</th>
               <th className="pb-4 text-right">ACTIONS</th>
             </tr>
           </thead>
