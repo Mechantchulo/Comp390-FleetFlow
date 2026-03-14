@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SearchIcon, ChevronLeftIcon, ChevronRightIcon, InboxIcon } from "../assets/icons";
+import { SearchIcon, ChevronLeftIcon, ChevronRightIcon, InboxIcon } from "../../assets/icons";
 
 const TABS = [
   { id: "all",      label: "All Requests", count: null },
@@ -89,7 +89,7 @@ export default function MyRequests() {
 
               {/* Driver with avatar */}
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xs font-bold flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xs font-bold shrink-0">
                   {req.driverInitials}
                 </div>
                 <span className="text-sm text-gray-700">{req.driver}</span>

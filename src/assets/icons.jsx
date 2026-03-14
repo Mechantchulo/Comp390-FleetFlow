@@ -29,3 +29,6 @@ export { MagnifyingGlassIcon as SearchIcon } from "@heroicons/react/24/outline";
 export { ChevronLeftIcon }                  from "@heroicons/react/24/outline";
 export { ChevronRightIcon }                 from "@heroicons/react/24/outline";
 export { InboxIcon }                        from "@heroicons/react/24/outline";
+/*trip history*/
+export { ClockIcon as EmptyIcon }            from "@heroicons/react/24/outline";
+export { FunnelIcon as FilterIcon }          from "@heroicons/react/24/outline";
