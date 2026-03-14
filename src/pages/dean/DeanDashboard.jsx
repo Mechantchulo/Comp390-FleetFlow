@@ -3,8 +3,7 @@ import { LayoutDashboard, History, User, Settings, LogOut, CheckCircle, XCircle,
 const DeanDashboard = () => {
   const [requests, setRequests] = useState([])
   const [user, setUser] = useState({
-    name: "Dr. Jane Doe",
-    faculty: "Faculty of Science"
+    name: "Dr. Jane Doe"
   });
   return (
     <div className="flex min-h-screen bg-[#F9FAFB] text-gray-800">
