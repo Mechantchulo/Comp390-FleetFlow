@@ -25,7 +25,7 @@ export default function App() {
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-teal-100 text-sm">
           🚚
         </span>
-        <span className="text-sm font-bold">FLEETflow</span>
+        <span className="text-sm font-bold">FleetFlow</span>
       </Link>
 
       <Routes>

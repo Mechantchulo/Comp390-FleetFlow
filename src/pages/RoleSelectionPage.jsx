@@ -110,7 +110,7 @@ const RoleSelectionPage = () => {
                 </div>
 
                 <p className="mt-16 text-center text-xs text-slate-400">
-                    © 2026 FLEETflow Logistics Solutions. All rights reserved.
+                    © 2026 FleetFlow Logistics Solutions. All rights reserved.
                 </p>
             </section>
         </main>
