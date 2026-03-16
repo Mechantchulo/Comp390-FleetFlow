@@ -62,3 +62,48 @@ docker run -p 4173:4173 fleetflow-frontend
 - `npm run build` - create production build in `dist/`
 - `npm run preview` - serve built app locally
 - `npm run lint` - run ESLint
+
+## GIT WORKFLOW FOR DEVS
+
+Use these steps for every frontend developer(THIS IS A MUST TO AVOID MERGE CONFLICTS)
+
+## STEP 1: In vs code
+Make sure you are in main branch to pull the latest changes before working on your feature
+```
+git checkout main
+```
+
+## STEP 2: PULLING THE MAIN BRANCH
+```
+git pull origin main
+```
+
+## STEP 3: GO TO YOUR BRANCH
+```
+git checkout <branchname>
+```
+
+## STEP 4: MERGE YOUR BRANCH WITH MAIN
+```
+git merge main
+```
+
+## STEP 5: WORK ON YOUR FEATURE THEN ADD THE CHANGED FILES
+```
+git add .
+```
+
+## STEP 6: Commit
+```
+git commit -m "commit-message"
+```
+
+## STEP 7: PUSH CHANGES TO BRANCH
+```
+git push origin <your-branch-name>
+```
+
+## STEP 8: Create PR in github and wait for approval then after aproval in github you merge in github
+
+## STEP 9: Then now go to vs-code and repeat the steps from step 1
+
