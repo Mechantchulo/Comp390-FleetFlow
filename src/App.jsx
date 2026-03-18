@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import DeanDashboard from "./pages/dean/DeanDashboard"
 import StaffDashboard from "./pages/staff/StaffDashboard";
+import DriverDashboard from "./pages/driver/DriverDashboard";
 function Placeholder({ title }) {
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -41,10 +42,7 @@ export default function App() {
 
 
         <Route path="/dashboard/department_dean" element={<DeanDashboard />} />
-        <Route
-          path="/dashboard/fleet_driver"
-          element={<Placeholder title="Fleet Driver Dashboard (WIP)" />}
-        />
+        <Route path="/dashboard/fleet_driver" element={<DriverDashboard />} />
       </Routes>
     </>
   );
