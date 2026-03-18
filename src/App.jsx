@@ -5,6 +5,7 @@ import SignUpPage from "./pages/SignUpPage";
 import DeanDashboard from "./pages/dean/DeanDashboard"
 import StaffDashboard from "./pages/staff/StaffDashboard";
 import DriverDashboard from "./pages/driver/DriverDashboard";
+import TransportManagerDashboard from "./pages/manager/TransportManagerDashboard";
 function Placeholder({ title }) {
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -36,7 +37,7 @@ export default function App() {
 
         <Route
           path="/dashboard/transport_manager"
-          element={<Placeholder title="Transport Manager Dashboard (WIP)" />}
+          element={<TransportManagerDashboard />}
         />
         <Route path="/dashboard/operations_staff" element={<StaffDashboard />} />
 
