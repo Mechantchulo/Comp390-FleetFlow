@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, History, User, Settings, LogOut, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom'; 
 const DeanDashboard = () => {
   const [requests, setRequests] = useState([])
   const [user, setUser] = useState({
@@ -7,6 +8,7 @@ const DeanDashboard = () => {
   });
   return (
     <div className="flex min-h-screen bg-[#F9FAFB] text-gray-800">
+   
       {/* SIDEBAR */}
       <aside className="w-64 bg-white border-r flex flex-col p-6">
         <div className="flex items-center gap-2 mb-10">
@@ -18,19 +20,28 @@ const DeanDashboard = () => {
           </h2>
         </div>
         <nav className="flex-1 space-y-4">
-          <div className="flex items-center gap-3 text-[#2A9D8F] font-semibold bg-[#E6F4F1] p-3 rounded-lg cursor-pointer">
+
+          {/* Dashboard */}
+          <Link to="/dean/dashboard" className="flex items-center gap-3 text-[#2A9D8F] font-semibold bg-[#E6F4F1] p-3 rounded-lg">
             <LayoutDashboard size={18} /> Dashboard
-          </div>
-          <div className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3 cursor-pointer">
+          </Link>
+
+          {/* Pending Requests */}
+          <Link to="/dean/pending" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
             <History size={18} /> Pending requests
-          </div>
-          <div className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3 cursor-pointer">
+          </Link>
+
+          {/* Request History */}
+          <Link to="/dean/history" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
             <History size={18} /> Request History
-          </div>
-          <div className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3 cursor-pointer">
+          </Link>
+
+          {/* Profile */}
+          <Link to="/dean/profile" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
             <User size={18} /> Profile
-          </div>
+          </Link>
         </nav>
+
         <div className="border-t pt-4 space-y-4">
           <div className="flex items-center gap-3 text-gray-500 p-3 cursor-pointer">
             <Settings size={18} /> Settings
@@ -52,6 +63,7 @@ const DeanDashboard = () => {
               Manage departmental transport requests and review history.
             </p>
           </div>
+
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="font-bold">{user.name}</p>
@@ -93,6 +105,7 @@ const DeanDashboard = () => {
               View All
             </button>
           </div>
+
           <table className="w-full text-left">
             <thead>
               <tr className="text-gray-400 text-xs uppercase tracking-wider border-b">
@@ -104,6 +117,7 @@ const DeanDashboard = () => {
                 <th className="pb-4 text-right">Actions</th>
               </tr>
             </thead>
+
             <tbody className="divide-y">
               {requests.length > 0 ? (
                 requests.map((req) => (
@@ -124,6 +138,7 @@ const DeanDashboard = () => {
                 </tr>
               )}
             </tbody>
+
           </table>
         </section>
       </main>
