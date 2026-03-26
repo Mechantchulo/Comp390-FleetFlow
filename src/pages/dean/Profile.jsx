@@ -31,14 +31,13 @@ const Profile = () => {
 
           <div>
             <h3 className="text-xl font-semibold">{user.name}</h3>
-            <p className="text-gray-400 text-sm">Faculty of {user.faculty}</p>
           </div>
 
         </div>
 
 
         {/* PROFILE INFO */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+        <div className="grid grid-cols-1 gap-6 text-sm">
 
           <div>
             <p className="text-gray-400">Gender</p>
@@ -62,7 +61,9 @@ const Profile = () => {
 
         </div>
 
-
+           <br></br>
+           <br></br>
+           <br></br>
         {/* ACTION BUTTONS */}
         <div>  <button className="bg-[#E6F4F1] text-[#2A9D8F] px-5 py-2 rounded-lg hover:bg-teal-100">
             Change Password
