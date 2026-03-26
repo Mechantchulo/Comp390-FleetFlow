@@ -7,6 +7,8 @@ import StaffDashboard from "./pages/staff/StaffDashboard";
 import DriverDashboard from "./pages/driver/DriverDashboard";
 import TransportManagerDashboard from "./pages/manager/TransportManagerDashboard";
 import ProfilePage from "./pages/dean/Profile";
+import PendingRequests from "./pages/dean/PendingRequests";
+import RequestHistory from "./pages/dean/RequestHistory";
 
 function Placeholder({ title }) {
   return (
@@ -40,8 +42,8 @@ export default function App() {
         <Route path="/dashboard/operations_staff" element={<StaffDashboard />} />
         <Route path="/dashboard/department_dean" element={<DeanDashboard />} />
         <Route path="/dashboard/fleet_driver" element={<DriverDashboard />} />
-        <Route path="/dean/pending" element={<Placeholder title="Pending Requests" />} />
-        <Route path="/dean/history" element={<Placeholder title="Request History" />} />
+        <Route path="/dean/pending" element={<PendingRequests />} />
+        <Route path="/dean/history" element={<RequestHistory />} />
         <Route path="/dean/profile" element={<ProfilePage />} />
       </Routes>
     </>

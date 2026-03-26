@@ -1,30 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import './RequestHistory.css';
 
 const RequestHistory = () => {
-  // Start with an EMPTY array
-  const [history, setHistory] = useState([]);
+  // 1. Initializing with Mock Data so you can see the table immediately
+  const [history, setHistory] = useState([
+    { id: "REQ-001", staff: "John Doe", dest: "Nairobi HQ", date: "2026-03-20", status: "Approved" },
+    { id: "REQ-002", staff: "Jane Smith", dest: "Mombasa Branch", date: "2026-03-22", status: "Pending" },
+    { id: "REQ-003", staff: "Alex Wong", dest: "Kisumu Office", date: "2026-03-24", status: "Cancelled" },
+    { id: "REQ-004", staff: "Sarah Muse", dest: "Nakuru Hub", date: "2026-03-25", status: "Approved" }
+  ]);
 
-  // This is where you will eventually fetch data from your SQL DB
-  useEffect(() => {
-    const fetchHistory = async () => {
-      // Once your backend is ready, you'll fetch data here
-      // For now, it stays empty ([])
-    };
-    fetchHistory();
-  }, []);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // 2. Logic to filter data based on the search bar input
+  const filteredHistory = history.filter(item => 
+    item.staff.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    item.dest.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="history-container">
       <div className="history-header">
         <h1>Request History</h1>
-        <p>View and manage all historical transport requests and their final status.</p>
+        <p>View and manage all historical transport requests and their status.</p>
       </div>
 
       <div className="table-card">
         <div className="table-actions">
           <h3>All Request History</h3>
-          <input type="text" placeholder="Search staff or destination..." className="search-bar" />
+          <input 
+            type="text" 
+            placeholder="Search staff or destination..." 
+            className="search-bar" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         <table className="history-table">
@@ -38,14 +47,15 @@ const RequestHistory = () => {
             </tr>
           </thead>
           <tbody>
-            {history.length > 0 ? (
-              history.map((item, index) => (
+            {filteredHistory.length > 0 ? (
+              filteredHistory.map((item, index) => (
                 <tr key={index}>
                   <td>{item.id}</td>
                   <td>{item.staff}</td>
                   <td>{item.dest}</td>
                   <td>{item.date}</td>
                   <td>
+                
                     <span className={`status-badge ${item.status.toLowerCase()}`}>
                       ● {item.status}
                     </span>
@@ -53,10 +63,9 @@ const RequestHistory = () => {
                 </tr>
               ))
             ) : (
-              // This shows when there is no data yet
               <tr>
                 <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                  No history records found. Logs will appear here once requests are processed.
+                  No records match your search.
                 </td>
               </tr>
             )}
@@ -64,7 +73,7 @@ const RequestHistory = () => {
         </table>
         
         <div className="table-footer">
-          Showing {history.length} historical records
+          Showing {filteredHistory.length} historical records
         </div>
       </div>
     </div>

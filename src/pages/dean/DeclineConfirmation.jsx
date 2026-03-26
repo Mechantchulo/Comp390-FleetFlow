@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './DeclineConfirmation.css';
 
 const DeclineConfirmation = ({ requestId, onConfirm, onCancel }) => {
   const [reason, setReason] = useState("");
