@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Outlet } from "react-router-dom";
 import { LayoutDashboard, History, User, Settings, LogOut, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom'; 
 const DeanDashboard = () => {
@@ -20,23 +21,15 @@ const DeanDashboard = () => {
           </h2>
         </div>
         <nav className="flex-1 space-y-4">
-
-          {/* Dashboard */}
           <Link to="/dean/dashboard" className="flex items-center gap-3 text-[#2A9D8F] font-semibold bg-[#E6F4F1] p-3 rounded-lg">
             <LayoutDashboard size={18} /> Dashboard
           </Link>
-
-          {/* Pending Requests */}
           <Link to="/dean/pending" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
             <History size={18} /> Pending requests
           </Link>
-
-          {/* Request History */}
           <Link to="/dean/history" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
             <History size={18} /> Request History
           </Link>
-
-          {/* Profile */}
           <Link to="/dean/profile" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
             <User size={18} /> Profile
           </Link>

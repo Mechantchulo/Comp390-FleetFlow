@@ -6,6 +6,8 @@ import DeanDashboard from "./pages/dean/DeanDashboard";
 import StaffDashboard from "./pages/staff/StaffDashboard";
 import DriverDashboard from "./pages/driver/DriverDashboard";
 import TransportManagerDashboard from "./pages/manager/TransportManagerDashboard";
+import ProfilePage from "./pages/dean/Profile";
+
 function Placeholder({ title }) {
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -29,22 +31,19 @@ export default function App() {
         </span>
         <span className="text-sm font-bold">FleetFlow</span>
       </Link>
-<Router>                          
+
       <Routes>
         <Route path="/" element={<RoleSelectionPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-
-        <Route path="/dashboard/transport_manager" element={<TransportManagerDashboard />}        />
+        <Route path="/dashboard/transport_manager" element={<TransportManagerDashboard />} />
         <Route path="/dashboard/operations_staff" element={<StaffDashboard />} />
+        <Route path="/dashboard/department_dean" element={<DeanDashboard />} />
         <Route path="/dashboard/fleet_driver" element={<DriverDashboard />} />
-        
-        <Route path="/dean/dashboard" element={<DeanDashboard />} />
         <Route path="/dean/pending" element={<Placeholder title="Pending Requests" />} />
         <Route path="/dean/history" element={<Placeholder title="Request History" />} />
-        <Route path="/dean/profile" element={<Placeholder title="Profile Page" />} />
+        <Route path="/dean/profile" element={<ProfilePage />} />
       </Routes>
-      </Router>
     </>
   );
 }
