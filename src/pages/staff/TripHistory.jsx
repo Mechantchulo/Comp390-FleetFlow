@@ -5,7 +5,7 @@ import {
   ChevronRightIcon,
   EmptyIcon,
   FilterIcon,
-} from "../assets/historyIcons";
+} from "../../assets/icons";
 
 const TABS = [
   { id: "all",       label: "All",       count: null },
@@ -107,7 +107,7 @@ export default function History() {
 
               {/* Driver with avatar */}
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xs font-bold flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xs font-bold shrink-0">
                   {trip.driverInitials}
                 </div>
                 <span className="text-sm text-gray-700">{trip.driver}</span>

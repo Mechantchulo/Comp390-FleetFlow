@@ -9,6 +9,8 @@ import TransportManagerDashboard from "./pages/manager/TransportManagerDashboard
 import ProfilePage from "./pages/dean/Profile";
 import PendingRequests from "./pages/dean/PendingRequests";
 import RequestHistory from "./pages/dean/RequestHistory";
+import MyRequests from "./pages/staff/myRequests";
+import TripHistory from "./pages/staff/TripHistory";
 
 function Placeholder({ title }) {
   return (
@@ -45,6 +47,8 @@ export default function App() {
         <Route path="/dean/pending" element={<PendingRequests />} />
         <Route path="/dean/history" element={<RequestHistory />} />
         <Route path="/dean/profile" element={<ProfilePage />} />
+        <Route path="/staff/myRequests" element={<MyRequests />} />
+        <Route path="/staff/TripHistory" element={<TripHistory />} />
       </Routes>
     </>
   );
