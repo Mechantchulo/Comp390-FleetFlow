@@ -9,7 +9,7 @@ import TransportManagerDashboard from "./pages/manager/TransportManagerDashboard
 import ProfilePage from "./pages/dean/Profile";
 import PendingRequests from "./pages/dean/PendingRequests";
 import RequestHistory from "./pages/dean/RequestHistory";
-import MyRequests from "./pages/staff/myRequests";
+import MyRequests from "./pages/staff/MyRequests";
 import TripHistory from "./pages/staff/TripHistory";
 
 function Placeholder({ title }) {
