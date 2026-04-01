@@ -78,8 +78,8 @@ function Sidebar() {
 
   const navItems = [
     { name: "Dashboard", icon: HomeIcon, path: "/" },
-    { name: "My Requests", icon: ClipboardDocumentListIcon, path: "/requests" },
-    { name: "History", icon: ClockIcon, path: "/history" },
+    { name: "My Requests", icon: ClipboardDocumentListIcon, path: "/staff/myRequests" },
+    { name: "History", icon: ClockIcon, path: "/staff/TripHistory" },
     { name: "Profile", icon: UserIcon, path: "/profile" },
   ];
 
