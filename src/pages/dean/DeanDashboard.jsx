@@ -21,7 +21,7 @@ const DeanDashboard = () => {
           </h2>
         </div>
         <nav className="flex-1 space-y-4">
-          <Link to="/dean/dashboard" className="flex items-center gap-3 text-[#2A9D8F] font-semibold bg-[#E6F4F1] p-3 rounded-lg">
+          <Link to="/dashboard/department_dean" className="flex items-center gap-3 text-[#2A9D8F] font-semibold bg-[#E6F4F1] p-3 rounded-lg">
             <LayoutDashboard size={18} /> Dashboard
           </Link>
           <Link to="/dean/pending" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">

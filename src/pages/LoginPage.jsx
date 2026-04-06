@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { loginUser } from "../lib/authApi";
+import { setAuthToken } from "../api/client";
+import { getCurrentTokenRole, getDashboardRouteForRole } from "../lib/session";
 
 export default function LoginPage() {
   const [params] = useSearchParams();
@@ -18,10 +20,13 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const data = await loginUser({ email, password });
-      if (data?.token) {
-        localStorage.setItem("token", data.token);
+      if (!data?.token) {
+        throw new Error("No token returned by server.");
       }
-      navigate("/dashboard");
+
+      setAuthToken(data.token);
+      const tokenRole = getCurrentTokenRole();
+      navigate(getDashboardRouteForRole(tokenRole), { replace: true });
     } catch (error) {
       alert(error.message || "Login failed. Please try again.");
     } finally {

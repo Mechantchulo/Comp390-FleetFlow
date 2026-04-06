@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { registerUser } from "../lib/authApi";
-import { toBackendRole } from "../lib/roleMap";
 
 export default function SignupPage() {
   const [params] = useSearchParams();
@@ -13,7 +12,9 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const restricted =
-    role === "transport_manager" || role === "department_dean";
+    role === "transport_manager" ||
+    role === "department_dean" ||
+    role === "fleet_driver";
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -23,9 +24,8 @@ export default function SignupPage() {
       return;
     }
 
-    const backendRole = toBackendRole[role];
-    if (!backendRole) {
-      alert("Invalid role selected.");
+    if (role !== "operations_staff") {
+      alert("Self-registration is available for operations staff only.");
       return;
     }
 
@@ -35,10 +35,9 @@ export default function SignupPage() {
         fullName,
         email,
         password,
-        role: backendRole,
       });
       alert("Account created successfully. Please sign in.");
-      navigate(`/login?role=${role}`);
+      navigate("/login?role=operations_staff");
     } catch (error) {
       alert(error.message || "Registration failed. Please try again.");
     } finally {

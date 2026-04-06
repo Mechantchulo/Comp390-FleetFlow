@@ -74,6 +74,7 @@ function testDriverTimetablePDF() {
 
 const links = [
   { to: "/dashboard/transport_manager", label: "Transport Manager Dashboard" },
+  { to: "/dashboard/admin", label: "Admin Operations Dashboard" },
   { to: "/dashboard/operations_staff", label: "Operations Staff Dashboard" },
   { to: "/dashboard/department_dean", label: "Department Dean Dashboard" },
   { to: "/dashboard/fleet_driver", label: "Fleet Driver Dashboard" },

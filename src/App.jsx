@@ -6,21 +6,12 @@ import DeanDashboard from "./pages/dean/DeanDashboard";
 import StaffDashboard from "./pages/staff/StaffDashboard";
 import DriverDashboard from "./pages/driver/DriverDashboard";
 import TransportManagerDashboard from "./pages/manager/TransportManagerDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProfilePage from "./pages/dean/Profile";
 import PendingRequests from "./pages/dean/PendingRequests";
 import RequestHistory from "./pages/dean/RequestHistory";
 import MyRequests from "./pages/staff/MyRequests";
 import TripHistory from "./pages/staff/TripHistory";
-
-function Placeholder({ title }) {
-  return (
-    <main className="min-h-screen bg-slate-50 flex items-center justify-center">
-      <h1 className="text-2xl font-semibold text-slate-800">
-        {title}
-      </h1>
-    </main>
-  );
-}
 
 export default function App() {
   return (
@@ -41,6 +32,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/dashboard/transport_manager" element={<TransportManagerDashboard />} />
+        <Route path="/dashboard/admin" element={<AdminDashboard />} />
         <Route path="/dashboard/operations_staff" element={<StaffDashboard />} />
         <Route path="/dashboard/department_dean" element={<DeanDashboard />} />
         <Route path="/dashboard/fleet_driver" element={<DriverDashboard />} />
