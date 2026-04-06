@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import DeclineConfirmation from "./DeclineConfirmation";
 import {
   approveTripRequest,
@@ -78,15 +80,22 @@ const PendingRequests = () => {
   };
 
   return (
-    <div className="bg-[#F9FAFB] min-h-screen p-8">
+    <div className="bg-slate-50 min-h-screen p-8">
+      <Link
+        to="/dashboard/department_dean"
+        className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+      >
+        <ArrowLeft size={14} />
+        Back To Dashboard
+      </Link>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Pending Requests</h2>
+        <h2 className="text-2xl font-bold text-slate-800">Pending Requests</h2>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <table className="w-full text-left">
           <thead>
-            <tr className="text-gray-400 text-xs uppercase tracking-wider border-b">
+            <tr className="text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
               <th className="pb-4">REQUEST ID</th>
               <th className="pb-4">REQUESTER</th>
               <th className="pb-4">PURPOSE</th>
@@ -105,7 +114,7 @@ const PendingRequests = () => {
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan="6" className="py-20 text-center text-red-500">
+                <td colSpan="6" className="py-20 text-center text-rose-600">
                   {error}
                 </td>
               </tr>
@@ -116,13 +125,13 @@ const PendingRequests = () => {
 
                   <td className="py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#E6F4F1] text-[#2A9D8F] rounded-full flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 bg-teal-50 text-teal-700 rounded-full flex items-center justify-center font-bold">
                         {initials(req.requesterName)}
                       </div>
 
                       <div>
                         <p className="font-semibold">{req.requesterName || "Unknown"}</p>
-                        <p className="text-xs text-gray-400">Requester</p>
+                        <p className="text-xs text-slate-400">Requester</p>
                       </div>
                     </div>
                   </td>
@@ -131,21 +140,21 @@ const PendingRequests = () => {
 
                   <td className="py-4">
                     <p>{formatDate(req.departureTime)}</p>
-                    <p className="text-xs text-gray-400">{req.destination || "-"}</p>
+                    <p className="text-xs text-slate-400">{req.destination || "-"}</p>
                   </td>
 
                   <td className="py-4">{req.status}</td>
 
                   <td className="py-4 text-right space-x-2">
                     <button
-                      className="bg-[#2A9D8F] text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-700"
+                      className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-700"
                       onClick={() => handleApprove(req.id)}
                     >
                       Approve
                     </button>
 
                     <button
-                      className="bg-red-50 text-red-500 px-3 py-2 rounded-lg text-sm hover:bg-red-100"
+                      className="bg-rose-50 text-rose-600 px-3 py-2 rounded-lg text-sm hover:bg-rose-100"
                       onClick={() => openDeclineModal(req.id)}
                     >
                       Reject
@@ -155,7 +164,7 @@ const PendingRequests = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="py-20 text-center text-gray-400">
+                <td colSpan="6" className="py-20 text-center text-slate-400">
                   No pending requests found.
                 </td>
               </tr>

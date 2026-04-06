@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   AlertTriangle,
+  ArrowLeft,
   Bell,
   Bus,
   CalendarDays,
@@ -621,13 +623,22 @@ export default function AdminDashboard() {
 
         <section className="flex-1 overflow-y-auto">
           <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 md:px-6">
-            <div className="relative w-full md:max-w-md">
-              <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search trips, requests, drivers, incidents..."
-                className="w-full rounded-full border border-slate-200 bg-slate-50 py-1.5 pl-9 pr-3 text-xs text-slate-600 outline-none placeholder:text-slate-400 focus:border-teal-400"
-              />
+            <div className="flex w-full items-center gap-2 md:max-w-md">
+              <Link
+                to="/"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-teal-700"
+              >
+                <ArrowLeft size={12} />
+                Welcome
+              </Link>
+              <div className="relative w-full">
+                <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search trips, requests, drivers, incidents..."
+                  className="w-full rounded-full border border-slate-200 bg-slate-50 py-1.5 pl-9 pr-3 text-xs text-slate-600 outline-none placeholder:text-slate-400 focus:border-teal-400"
+                />
+              </div>
             </div>
             <div className="ml-auto flex items-center gap-3 md:gap-5">
               <button type="button" className="relative text-slate-500 hover:text-slate-700" aria-label="Notifications">

@@ -1,4 +1,4 @@
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -14,18 +14,26 @@ import MyRequests from "./pages/staff/MyRequests";
 import TripHistory from "./pages/staff/TripHistory";
 
 export default function App() {
+  const location = useLocation();
+  const showGlobalHomePill =
+    location.pathname === "/" ||
+    location.pathname === "/login" ||
+    location.pathname === "/signup";
+
   return (
     <>
-      <Link
-        to="/"
-        aria-label="Go to welcome page"
-        className="fixed left-6 top-6 z-50 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white/80 px-3 py-2 text-teal-700 shadow-sm backdrop-blur-sm hover:bg-white"
-      >
-        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-teal-100 text-sm">
-          🚚
-        </span>
-        <span className="text-sm font-bold">FleetFlow</span>
-      </Link>
+      {showGlobalHomePill && (
+        <Link
+          to="/"
+          aria-label="Go to welcome page"
+          className="fixed left-6 top-6 z-50 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white/80 px-3 py-2 text-teal-700 shadow-sm backdrop-blur-sm hover:bg-white"
+        >
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-teal-100 text-sm">
+            🚚
+          </span>
+          <span className="text-sm font-bold">FleetFlow</span>
+        </Link>
+      )}
 
       <Routes>
         <Route path="/" element={<RoleSelectionPage />} />

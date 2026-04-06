@@ -1,30 +1,27 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import {
+  ArrowLeft,
+  Bell,
+  CheckCircle2,
+  ClipboardList,
+  Clock3,
+  Gauge,
+  Search,
+  Settings,
+  Truck,
+  User,
+} from "lucide-react";
 import { createTripRequest, listTripRequests } from "../../api/trips";
 
-import {
-  HomeIcon,
-  ClipboardDocumentListIcon,
-  ClockIcon,
-  UserIcon,
-  Cog6ToothIcon,
-  BellIcon,
-  MagnifyingGlassIcon,
-  CheckCircleIcon,
-  DocumentTextIcon,
-  TruckIcon,
-} from "../../assets/icons";
+function formatDate(value) {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleString();
+}
 
-/* Main dashboard */
-export default function StaffDashboard({
-  totalRequests,
-  approvedRequests,
-  pendingRequests,
-  recentRequests,
-  onSubmitRequest,
-  onViewDetails,
-  onSearch,
-}) {
+export default function StaffDashboard({ onSubmitRequest, onViewDetails, onSearch }) {
   const [allRequests, setAllRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,30 +42,25 @@ export default function StaffDashboard({
     loadRequests();
   }, []);
 
-  const requests = recentRequests ?? allRequests;
   const stats = useMemo(() => {
-    const total = requests.length;
-    const approved = requests.filter((item) => item.status === "APPROVED").length;
-    const pending = requests.filter((item) => item.status === "PENDING").length;
+    const total = allRequests.length;
+    const approved = allRequests.filter((item) => item.status === "APPROVED").length;
+    const pending = allRequests.filter((item) => item.status === "PENDING").length;
     return { total, approved, pending };
-  }, [requests]);
+  }, [allRequests]);
 
   const filteredRequests = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return requests;
+    if (!query) return allRequests;
 
-    return requests.filter((item) => {
+    return allRequests.filter((item) => {
       return (
         String(item.id).toLowerCase().includes(query) ||
         String(item.destination || "").toLowerCase().includes(query) ||
         String(item.purpose || "").toLowerCase().includes(query)
       );
     });
-  }, [requests, searchQuery]);
-
-  const effectiveTotalRequests = totalRequests ?? stats.total;
-  const effectiveApprovedRequests = approvedRequests ?? stats.approved;
-  const effectivePendingRequests = pendingRequests ?? stats.pending;
+  }, [allRequests, searchQuery]);
 
   const handleSearch = (value) => {
     setSearchQuery(value);
@@ -105,111 +97,95 @@ export default function StaffDashboard({
   };
 
   return (
-    <div className="flex bg-gray-100 min-h-screen">
-      <Sidebar />
+    <main className="min-h-screen bg-slate-100 p-2 text-slate-700 md:p-4">
+      <div className="mx-auto flex min-h-screen max-w-[1280px] flex-col overflow-hidden rounded-md border border-slate-200 bg-slate-50 shadow-sm lg:flex-row">
+        <Sidebar />
 
-      <div className="flex-1 flex flex-col">
-        <Header onSearch={handleSearch} />
+        <div className="flex-1 flex flex-col overflow-y-auto">
+          <Header onSearch={handleSearch} />
 
-        <main className="p-6 space-y-6">
+          <main className="p-3 md:p-5 space-y-6">
+            <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <StatCard
+                title="Total Requests"
+                value={String(stats.total)}
+                subtitle="Live backend total"
+                icon={<ClipboardList size={16} />}
+                color="bg-teal-50 text-teal-700"
+              />
+              <StatCard
+                title="Approved"
+                value={String(stats.approved)}
+                subtitle="Approved requests"
+                icon={<CheckCircle2 size={16} />}
+                color="bg-emerald-50 text-emerald-700"
+              />
+              <StatCard
+                title="Pending"
+                value={String(stats.pending)}
+                subtitle="Awaiting dean/admin"
+                icon={<Clock3 size={16} />}
+                color="bg-amber-50 text-amber-700"
+              />
+            </section>
 
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatCard
-              title="Total Requests"
-              value={effectiveTotalRequests}
-              subtitle="+12% this month"
-              icon={<DocumentTextIcon className="w-6 h-6" />}
-              color="bg-teal-100 text-teal-600"
+            <RequestForm onSubmitRequest={handleSubmitRequest} />
+
+            <RequestTable
+              requests={filteredRequests}
+              onViewDetails={handleViewDetails}
+              loading={loading}
             />
-
-            <StatCard
-              title="Approved"
-              value={effectiveApprovedRequests}
-              subtitle="90% Success rate"
-              icon={<CheckCircleIcon className="w-6 h-6" />}
-              color="bg-green-100 text-green-600"
-            />
-
-            <StatCard
-              title="Pending"
-              value={effectivePendingRequests}
-              subtitle="Awaiting review"
-              icon={<ClockIcon className="w-6 h-6" />}
-              color="bg-yellow-100 text-yellow-600"
-            />
-          </div>
-
-          <RequestForm onSubmitRequest={handleSubmitRequest} />
-
-          <RequestTable
-            requests={filteredRequests}
-            onViewDetails={handleViewDetails}
-            loading={loading}
-          />
-        </main>
+          </main>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
 
-/*Sidebar*/
 function Sidebar() {
   const location = useLocation();
 
   const navItems = [
-    { name: "Dashboard", icon: HomeIcon, path: "/dashboard/operations_staff" },
-    { name: "My Requests", icon: ClipboardDocumentListIcon, path: "/staff/myRequests" },
-    { name: "History", icon: ClockIcon, path: "/staff/TripHistory" },
-    { name: "Profile", icon: UserIcon, path: "/profile" },
+    { name: "Dashboard", icon: Gauge, path: "/dashboard/operations_staff" },
+    { name: "My Requests", icon: ClipboardList, path: "/staff/myRequests" },
+    { name: "History", icon: Clock3, path: "/staff/TripHistory" },
+    { name: "Profile", icon: User, path: "/profile" },
   ];
 
   return (
-    <aside className="w-64 bg-white border-r flex flex-col justify-between min-h-screen">
-
-      <div>
-
-        <div className="flex items-center gap-3 p-6">
-          <div className="bg-teal-600 text-white p-2 rounded-lg">
-            <TruckIcon className="w-5 h-5" />
-          </div>
-
-          <div>
-            <h1 className="font-semibold text-gray-800">TMS Staff</h1>
-            <p className="text-xs text-gray-500">Transport Hub</p>
-          </div>
+    <aside className="flex w-full flex-col border-b border-slate-200 bg-white lg:w-[250px] lg:border-b-0 lg:border-r">
+      <div className="border-b border-slate-100 p-4 md:p-5">
+        <div className="mb-1 flex items-center gap-2 text-teal-700">
+          <Truck size={16} />
+          <p className="text-sm font-bold">FLEETflow</p>
         </div>
-
-        <nav className="px-3 space-y-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = location.pathname === item.path;
-
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition
-                ${
-                  active
-                    ? "bg-teal-100 text-teal-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Staff Portal</p>
       </div>
 
-      <div className="p-4">
-        <Link
-          to="/settings"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100"
-        >
-          <Cog6ToothIcon className="w-5 h-5" />
+      <nav className="flex-1 p-3 md:p-4 space-y-1">
+        {navItems.map((item) => {
+          const active = location.pathname === item.path;
+          return (
+            <Link
+              key={item.name}
+              to={item.path}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm ${
+                active
+                  ? "bg-teal-50 font-semibold text-teal-700"
+                  : "text-slate-500 hover:bg-slate-100"
+              }`}
+            >
+              <item.icon size={16} />
+              {item.name}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="border-t border-slate-100 p-3 md:p-4">
+        <Link to="/settings" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-slate-100">
+          <Settings size={16} />
           Settings
         </Link>
       </div>
@@ -217,69 +193,62 @@ function Sidebar() {
   );
 }
 
-/*Header*/
 function Header({ onSearch }) {
   const [query, setQuery] = useState("");
 
-  const handleSearch = (e) => {
-    const value = e.target.value;
+  const handleSearch = (event) => {
+    const value = event.target.value;
     setQuery(value);
     if (onSearch) onSearch(value);
   };
 
   return (
-    <header className="bg-white border-b px-6 py-4 flex items-center justify-between">
-
-      <div className="relative w-full max-w-lg">
-        <MagnifyingGlassIcon
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-        />
-
-        <input
-          type="text"
-          value={query}
-          onChange={handleSearch}
-          placeholder="Search trips, requests..."
-          className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-        />
+    <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 md:px-6">
+      <div className="flex w-full items-center gap-2 md:max-w-md">
+        <Link
+          to="/"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-teal-700"
+        >
+          <ArrowLeft size={12} />
+          Welcome
+        </Link>
+        <div className="relative w-full">
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={query}
+            onChange={handleSearch}
+            placeholder="Search trips, requests..."
+            className="w-full rounded-full border border-slate-200 bg-slate-50 pl-9 pr-4 py-2 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-400"
+          />
+        </div>
       </div>
 
-      <div className="flex items-center gap-6 ml-6">
-        <BellIcon className="w-6 h-6 text-gray-500" />
-         {/*user profile */}
-        <div className="flex items-center gap-3">
-          <img
-            src="https://i.pravatar.cc/40"
-            alt="avatar"
-            className="w-8 h-8 rounded-full"
-          />
-
-          <span className="text-sm font-medium text-gray-700">
-            User
-          </span>
+      <div className="ml-auto flex items-center gap-3 md:gap-5">
+        <Bell size={16} className="text-slate-500" />
+        <div className="hidden text-right sm:block">
+          <p className="text-xs font-semibold text-slate-700">Operations Staff</p>
+          <p className="text-[11px] text-slate-400">FleetFlow</p>
         </div>
+        <div className="h-8 w-8 rounded-full bg-teal-100 text-teal-700 grid place-items-center text-xs font-semibold">ST</div>
       </div>
     </header>
   );
 }
 
-/*Stat card */
 function StatCard({ title, value, subtitle, icon, color }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-5 flex justify-between items-center">
-
-      <div>
-        <p className="text-sm text-gray-500">{title}</p>
-        <h2 className="text-2xl font-semibold text-gray-800">{value}</h2>
-        <p className="text-xs text-green-500 mt-1">{subtitle}</p>
+    <article className="rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="mb-4 flex items-start justify-between">
+        <div className={`rounded-lg p-2 ${color}`}>{icon}</div>
       </div>
-
-      <div className={`p-3 rounded-full ${color}`}>{icon}</div>
-    </div>
+      <p className="text-xs text-slate-400">{title}</p>
+      <p className="text-3xl font-bold text-slate-800">{value}</p>
+      <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
+    </article>
   );
 }
 
-/* Request form */
 function RequestForm({ onSubmitRequest }) {
   const [form, setForm] = useState({
     purpose: "",
@@ -288,118 +257,98 @@ function RequestForm({ onSubmitRequest }) {
     returnTime: "",
   });
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (event) => {
+    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
     if (onSubmitRequest) onSubmitRequest(form);
-    setForm({
-      purpose: "",
-      destination: "",
-      departureTime: "",
-      returnTime: "",
-    });
+    setForm({ purpose: "", destination: "", departureTime: "", returnTime: "" });
   };
 
   return (
-    <div className="bg-white border rounded-xl shadow-sm">
-
-      <div className="flex justify-between items-center px-6 py-4 border-b">
-        <h2 className="font-semibold text-gray-800">New Bus Request</h2>
-        <span className="text-xs text-gray-400 tracking-widest">
-          TRIP FORM
-        </span>
+    <section className="rounded-2xl border border-slate-200 bg-white">
+      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <h2 className="font-semibold text-slate-800">New Trip Request</h2>
+        <span className="text-xs tracking-widest text-slate-400">TRIP FORM</span>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
-
         <div>
-          <label className="text-sm text-gray-600">Purpose of Trip</label>
+          <label className="text-sm text-slate-600">Purpose of Trip</label>
           <input
             name="purpose"
             value={form.purpose}
             onChange={handleChange}
             placeholder="e.g. Client Site Visit, Team Offsite"
-            className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
+            className="w-full mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
             required
           />
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-
           <div>
-            <label className="text-sm text-gray-600">Destination</label>
+            <label className="text-sm text-slate-600">Destination</label>
             <input
               name="destination"
               value={form.destination}
               onChange={handleChange}
               placeholder="Location address"
-              className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
+              className="w-full mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">Departure Time</label>
+            <label className="text-sm text-slate-600">Departure Time</label>
             <input
               type="datetime-local"
               name="departureTime"
               value={form.departureTime}
               onChange={handleChange}
-              className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
+              className="w-full mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">Return Time</label>
+            <label className="text-sm text-slate-600">Return Time</label>
             <input
               type="datetime-local"
               name="returnTime"
               value={form.returnTime}
               onChange={handleChange}
-              className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
+              className="w-full mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
               required
             />
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="w-full mt-4 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium transition"
-        >
+        <button type="submit" className="mt-4 w-full rounded-full bg-teal-600 py-3 font-medium text-white hover:bg-teal-700">
           Submit Request
         </button>
       </form>
-    </div>
+    </section>
   );
 }
 
-/* Request table */
 function RequestTable({ requests, onViewDetails, loading }) {
-
   const statusStyles = {
-    PENDING: "bg-yellow-100 text-yellow-700",
-    APPROVED: "bg-green-100 text-green-700",
-    REJECTED: "bg-red-100 text-red-700",
+    PENDING: "bg-amber-100 text-amber-700",
+    APPROVED: "bg-emerald-100 text-emerald-700",
+    REJECTED: "bg-rose-100 text-rose-700",
   };
 
   return (
-    <div className="bg-white border rounded-xl shadow-sm">
-
-      <div className="px-6 py-4 border-b">
-        <h2 className="font-semibold text-gray-800">Recent Requests</h2>
+    <section className="rounded-2xl border border-slate-200 bg-white">
+      <div className="border-b border-slate-100 px-6 py-4">
+        <h2 className="font-semibold text-slate-800">Recent Requests</h2>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-
-          <thead className="bg-gray-50 text-gray-500 text-left">
+          <thead className="bg-slate-50 text-left text-slate-500">
             <tr>
               <th className="px-6 py-3">ID</th>
               <th className="px-6 py-3">Destination</th>
@@ -410,66 +359,41 @@ function RequestTable({ requests, onViewDetails, loading }) {
           </thead>
 
           <tbody>
-
             {loading && (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-400">
-                  Loading requests...
-                </td>
+                <td colSpan={5} className="py-6 text-center text-slate-400">Loading requests...</td>
               </tr>
             )}
 
             {!loading && requests.length === 0 && (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-400">
-                  No requests yet
-                </td>
+                <td colSpan={5} className="py-6 text-center text-slate-400">No requests yet</td>
               </tr>
             )}
 
-            {requests.map((req) => (
-              <tr key={req.id} className="border-t hover:bg-gray-50">
-
-                <td className="px-6 py-4 font-medium text-gray-700">
-                  {req.id}
-                </td>
-
-                <td className="px-6 py-4 text-gray-600">
-                  {req.destination}
-                </td>
-
-                <td className="px-6 py-4 text-gray-500">
-                  {req.departureTime
-                    ? new Date(req.departureTime).toLocaleString()
-                    : "-"}
-                </td>
-
+            {requests.map((request) => (
+              <tr key={request.id} className="border-t border-slate-100 hover:bg-slate-50">
+                <td className="px-6 py-4 font-medium text-slate-700">#{request.id}</td>
+                <td className="px-6 py-4 text-slate-600">{request.destination}</td>
+                <td className="px-6 py-4 text-slate-500">{formatDate(request.departureTime)}</td>
                 <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      statusStyles[req.status] || "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {req.status || "UNKNOWN"}
+                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[request.status] || "bg-slate-100 text-slate-700"}`}>
+                    {request.status || "UNKNOWN"}
                   </span>
                 </td>
-
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => onViewDetails && onViewDetails(req)}
-                    className="text-teal-600 hover:underline font-medium"
+                    onClick={() => onViewDetails && onViewDetails(request)}
+                    className="font-medium text-teal-600 hover:underline"
                   >
                     Details
                   </button>
                 </td>
-
               </tr>
             ))}
-
           </tbody>
-
         </table>
       </div>
-    </div>
+    </section>
   );
-} 
+}
