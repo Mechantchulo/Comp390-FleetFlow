@@ -1,5 +1,8 @@
+const configuredBase = (import.meta.env.VITE_API_BASE_URL || "")
+  .trim()
+  .replace(/\/$/, "");
 const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+  configuredBase || (import.meta.env.DEV ? "http://localhost:8080" : "");
 
 const TOKEN_STORAGE_KEY = "token";
 
