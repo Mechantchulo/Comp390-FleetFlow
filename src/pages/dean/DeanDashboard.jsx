@@ -1,137 +1,145 @@
-import React, { useState } from 'react';
-import { Outlet } from "react-router-dom";
-import { LayoutDashboard, History, User, Settings, LogOut, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom'; 
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, LayoutDashboard, History, User, Settings, LogOut, CheckCircle, XCircle, Clock } from "lucide-react";
+import { listTripRequests } from "../../api/trips";
+
+function formatDate(value) {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleString();
+}
+
 const DeanDashboard = () => {
-  const [requests, setRequests] = useState([])
-  const [user, setUser] = useState({
-    name: "Dr. Jane Doe"
-  });
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function loadRequests() {
+      try {
+        setLoading(true);
+        const data = await listTripRequests();
+        setRequests(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError(err.message || "Failed to load requests.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadRequests();
+  }, []);
+
+  const stats = useMemo(() => {
+    const pending = requests.filter((item) => item.status === "PENDING").length;
+    const approved = requests.filter((item) => item.status === "APPROVED").length;
+    const rejected = requests.filter((item) => item.status === "REJECTED").length;
+    return { pending, approved, rejected };
+  }, [requests]);
+
+  const pendingRequests = useMemo(
+    () => requests.filter((item) => item.status === "PENDING").slice(0, 8),
+    [requests]
+  );
+
   return (
-    <div className="flex min-h-screen bg-[#F9FAFB] text-gray-800">
-   
-      {/* SIDEBAR */}
+    <div className="flex min-h-screen bg-slate-50 text-slate-800">
       <aside className="w-64 bg-white border-r flex flex-col p-6">
         <div className="flex items-center gap-2 mb-10">
-          <div className="bg-[#2A9D8F] p-2 rounded-lg text-white">
+          <div className="bg-teal-600 p-2 rounded-lg text-white">
             <LayoutDashboard size={20} />
           </div>
-          <h2 className="text-xl font-bold text-[#2A9D8F] uppercase tracking-wider">
-            Fleetflow
-          </h2>
+          <h2 className="text-xl font-bold text-teal-700 uppercase tracking-wider">Fleetflow</h2>
         </div>
+
         <nav className="flex-1 space-y-4">
-          <Link to="/dashboard/department_dean" className="flex items-center gap-3 text-[#2A9D8F] font-semibold bg-[#E6F4F1] p-3 rounded-lg">
+          <Link to="/dashboard/department_dean" className="flex items-center gap-3 text-teal-700 font-semibold bg-teal-50 p-3 rounded-lg">
             <LayoutDashboard size={18} /> Dashboard
           </Link>
-          <Link to="/dean/pending" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
+          <Link to="/dean/pending" className="flex items-center gap-3 text-slate-500 hover:text-teal-700 p-3">
             <History size={18} /> Pending requests
           </Link>
-          <Link to="/dean/history" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
+          <Link to="/dean/history" className="flex items-center gap-3 text-slate-500 hover:text-teal-700 p-3">
             <History size={18} /> Request History
           </Link>
-          <Link to="/dean/profile" className="flex items-center gap-3 text-gray-500 hover:text-[#2A9D8F] p-3">
+          <Link to="/dean/profile" className="flex items-center gap-3 text-slate-500 hover:text-teal-700 p-3">
             <User size={18} /> Profile
           </Link>
         </nav>
 
         <div className="border-t pt-4 space-y-4">
-          <div className="flex items-center gap-3 text-gray-500 p-3 cursor-pointer">
+          <div className="flex items-center gap-3 text-slate-500 p-3 cursor-pointer">
             <Settings size={18} /> Settings
           </div>
-          <div className="flex items-center gap-3 text-red-500 p-3 cursor-pointer">
+          <div className="flex items-center gap-3 text-rose-500 p-3 cursor-pointer">
             <LogOut size={18} /> Logout
           </div>
         </div>
       </aside>
 
-      {/* MAIN CONTENT */}
       <main className="flex-1 p-10">
-        <header className="flex justify-between items-center mb-10">
-          <div>
-            <h1 className="text-3xl font-bold">
-              Dean Approval Dashboard
-            </h1>
-            <p className="text-gray-500">
-              Manage departmental transport requests and review history.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="font-bold">{user.name}</p>
-              <p className="text-xs text-gray-400">{user.faculty}</p>
-            </div>
-            <div className="w-12 h-12 bg-[#2A9D8F] rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-sm">
-              {user.name.charAt(0)}
-            </div>
-          </div>
+        <header className="mb-8">
+          <Link
+            to="/"
+            className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-teal-700"
+          >
+            <ArrowLeft size={12} />
+            Welcome
+          </Link>
+          <h1 className="text-3xl font-bold">Dean Approval Dashboard</h1>
+          <p className="text-slate-500">Review and approve transport requests.</p>
         </header>
 
-        {/* STAT CARDS */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <StatCard
-            title="Total Pending"
-            count="12"
-            icon={<Clock className="text-yellow-500" />}
-            change="+5% from last week"
-          />
-          <StatCard
-            title="Approved Today"
-            count="08"
-            icon={<CheckCircle className="text-green-500" />}
-            change="+12% from yesterday"
-          />
-          <StatCard
-            title="Declined Today"
-            count="02"
-            icon={<XCircle className="text-red-500" />}
-            change="-2% from yesterday"
-          />
+        {error && (
+          <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {error}
+          </div>
+        )}
+
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <StatCard title="Total Pending" count={loading ? "..." : String(stats.pending)} icon={<Clock className="text-amber-500" />} />
+          <StatCard title="Approved" count={loading ? "..." : String(stats.approved)} icon={<CheckCircle className="text-emerald-500" />} />
+          <StatCard title="Rejected" count={loading ? "..." : String(stats.rejected)} icon={<XCircle className="text-rose-500" />} />
         </section>
 
-        {/* REQUESTS TABLE */}
-        <section className="bg-white rounded-2xl shadow-sm border p-6">
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold">Pending Requests</h3>
-            <button className="text-[#2A9D8F] text-sm font-semibold hover:underline">
-              View All
-            </button>
+            <h3 className="text-lg font-bold">Latest Pending Requests</h3>
+            <Link to="/dean/pending" className="text-teal-700 text-sm font-semibold hover:underline">View All</Link>
           </div>
 
           <table className="w-full text-left">
             <thead>
-              <tr className="text-gray-400 text-xs uppercase tracking-wider border-b">
+              <tr className="text-slate-400 text-xs uppercase tracking-wider border-b">
                 <th className="pb-4">Request ID</th>
                 <th className="pb-4">Requester</th>
                 <th className="pb-4">Purpose</th>
-                <th className="pb-4">Date & Dest.</th>
-                <th className="pb-4 text-center">Pax</th>
-                <th className="pb-4 text-right">Actions</th>
+                <th className="pb-4">Date</th>
+                <th className="pb-4">Destination</th>
               </tr>
             </thead>
-
             <tbody className="divide-y">
-              {requests.length > 0 ? (
-                requests.map((req) => (
-                  <tr key={req.id} className="text-sm"></tr>
-                ))
-              ) : (
+              {loading ? (
                 <tr>
-                  <td colSpan="6" className="py-20 text-center">
-                    <div className="flex flex-col items-center justify-center text-gray-400">
-                      <p className="font-medium text-gray-500">
-                        No pending requests
-                      </p>
-                      <p className="text-xs">
-                        Everything is currently up to date.
-                      </p>
-                    </div>
-                  </td>
+                  <td colSpan="5" className="py-8 text-center text-slate-500">Loading...</td>
                 </tr>
+              ) : pendingRequests.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="py-8 text-center text-slate-400">No pending requests.</td>
+                </tr>
+              ) : (
+                pendingRequests.map((req) => (
+                  <tr key={req.id}>
+                    <td className="py-4">#{req.id}</td>
+                    <td className="py-4">{req.requesterName || "Unknown"}</td>
+                    <td className="py-4">{req.purpose || "-"}</td>
+                    <td className="py-4">{formatDate(req.departureTime)}</td>
+                    <td className="py-4">{req.destination || "-"}</td>
+                  </tr>
+                ))
               )}
             </tbody>
-
           </table>
         </section>
       </main>
@@ -139,25 +147,15 @@ const DeanDashboard = () => {
   );
 };
 
-
-// STAT CARD COMPONENT
-const StatCard = ({ title, count, icon, change }) => (
-  <div className="bg-white p-6 rounded-2xl border shadow-sm flex flex-col gap-2">
+const StatCard = ({ title, count, icon }) => (
+  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-2">
     <div className="flex justify-between items-start">
       <div>
-        <p className="text-gray-400 text-sm font-medium">{title}</p>
+        <p className="text-slate-400 text-sm font-medium">{title}</p>
         <p className="text-3xl font-bold">{count}</p>
       </div>
-      <div className="bg-[#E6F4F1] p-2 rounded-lg">
-        {icon}
-      </div>
+      <div className="bg-teal-50 p-2 rounded-lg">{icon}</div>
     </div>
-    <p className="text-xs text-gray-400 font-medium">
-      <span className={change.includes('+') ? 'text-green-500' : 'text-red-400'}>
-        {change.split(' ')[0]}
-      </span>
-      {" "}{change.split(' ').slice(1).join(' ')}
-    </p>
   </div>
 );
 
