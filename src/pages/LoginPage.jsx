@@ -8,12 +8,24 @@ export default function LoginPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const role = params.get("role") || "";
+  const [selectedRole, setSelectedRole] = useState(role);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const restricted =
-    role === "transport_manager" || role === "department_dean";
+    selectedRole === "transport_manager" ||
+    selectedRole === "department_dean" ||
+    selectedRole === "fleet_driver" ||
+    selectedRole === "admin";
+
+  const roleParamToBackendRole = {
+    transport_manager: "TRANSPORT_MANAGER",
+    operations_staff: "STAFF",
+    department_dean: "DEAN",
+    fleet_driver: "DRIVER",
+    admin: "ADMIN",
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,7 +38,10 @@ export default function LoginPage() {
 
       setAuthToken(data.token);
       const tokenRole = getCurrentTokenRole();
-      navigate(getDashboardRouteForRole(tokenRole), { replace: true });
+      const fallbackRole = roleParamToBackendRole[selectedRole] || null;
+      navigate(getDashboardRouteForRole(tokenRole || fallbackRole), {
+        replace: true,
+      });
     } catch (error) {
       alert(error.message || "Login failed. Please try again.");
     } finally {
@@ -39,7 +54,7 @@ export default function LoginPage() {
       alert("This role is provisioned by admin. Please contact system admin.");
       return;
     }
-    navigate(`/signup?role=${role}`);
+    navigate(`/signup?role=${selectedRole}`);
   };
 
   return (
@@ -47,12 +62,28 @@ export default function LoginPage() {
       <div className="mx-auto mt-20 max-w-md rounded-2xl bg-white p-8 shadow-sm">
         <h1 className="text-2xl font-bold text-slate-900">Login</h1>
         <p className="mt-2 text-sm text-slate-500">
-          Role: {role || "Not selected"}
+          Role: {selectedRole || "Not selected"}
         </p>
 
         <form onSubmit={handleLogin}>
-          <input
+          <select
             className="mt-6 w-full rounded-lg border p-3"
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            required
+          >
+            <option value="" disabled>
+              Select role
+            </option>
+            <option value="admin">Admin</option>
+            <option value="transport_manager">Transport Manager</option>
+            <option value="operations_staff">Operations Staff</option>
+            <option value="department_dean">Department Dean</option>
+            <option value="fleet_driver">Fleet Driver</option>
+          </select>
+
+          <input
+            className="mt-3 w-full rounded-lg border p-3"
             placeholder="Email"
             type="email"
             value={email}

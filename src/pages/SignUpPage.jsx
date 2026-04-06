@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const restricted =
+    role === "admin" ||
     role === "transport_manager" ||
     role === "department_dean" ||
     role === "fleet_driver";
