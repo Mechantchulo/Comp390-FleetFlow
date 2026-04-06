@@ -4,6 +4,12 @@ import DevMenu from "../components/DevMenu";
 
 const roles = [
     {
+        id: "admin",
+        title: "Admin",
+        subtitle: "System Control",
+        icon: "🧭",
+    },
+    {
         id: "transport_manager",
         title: "Transport Manager",
         subtitle: "Logistics & Strategy",
