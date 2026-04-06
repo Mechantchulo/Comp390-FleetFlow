@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { createTripRequest, listTripRequests } from "../../api/trips";
 
 import {
   HomeIcon,
@@ -16,20 +17,99 @@ import {
 
 /* Main dashboard */
 export default function StaffDashboard({
-  totalRequests = 0,
-  approvedRequests = 0,
-  pendingRequests = 2,
-  recentRequests = [],
+  totalRequests,
+  approvedRequests,
+  pendingRequests,
+  recentRequests,
   onSubmitRequest,
   onViewDetails,
   onSearch,
 }) {
+  const [allRequests, setAllRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    async function loadRequests() {
+      try {
+        setLoading(true);
+        const data = await listTripRequests();
+        setAllRequests(Array.isArray(data) ? data : []);
+      } catch (error) {
+        window.alert(error.message || "Failed to load trip requests.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadRequests();
+  }, []);
+
+  const requests = recentRequests ?? allRequests;
+  const stats = useMemo(() => {
+    const total = requests.length;
+    const approved = requests.filter((item) => item.status === "APPROVED").length;
+    const pending = requests.filter((item) => item.status === "PENDING").length;
+    return { total, approved, pending };
+  }, [requests]);
+
+  const filteredRequests = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return requests;
+
+    return requests.filter((item) => {
+      return (
+        String(item.id).toLowerCase().includes(query) ||
+        String(item.destination || "").toLowerCase().includes(query) ||
+        String(item.purpose || "").toLowerCase().includes(query)
+      );
+    });
+  }, [requests, searchQuery]);
+
+  const effectiveTotalRequests = totalRequests ?? stats.total;
+  const effectiveApprovedRequests = approvedRequests ?? stats.approved;
+  const effectivePendingRequests = pendingRequests ?? stats.pending;
+
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+    if (onSearch) onSearch(value);
+  };
+
+  const handleSubmitRequest = async (form) => {
+    if (onSubmitRequest) return onSubmitRequest(form);
+
+    try {
+      const normalizeDateTime = (value) => {
+        if (!value) return value;
+        return value.length === 16 ? `${value}:00` : value;
+      };
+
+      const response = await createTripRequest({
+        purpose: form.purpose,
+        destination: form.destination,
+        departureTime: normalizeDateTime(form.departureTime),
+        returnTime: normalizeDateTime(form.returnTime),
+      });
+      setAllRequests((prev) => [response, ...prev]);
+      window.alert("Trip request submitted.");
+    } catch (error) {
+      window.alert(error.message || "Failed to submit request.");
+    }
+  };
+
+  const handleViewDetails = (request) => {
+    if (onViewDetails) return onViewDetails(request);
+    window.alert(
+      `Trip #${request.id}\nDestination: ${request.destination}\nPurpose: ${request.purpose}\nStatus: ${request.status}`
+    );
+  };
+
   return (
     <div className="flex bg-gray-100 min-h-screen">
       <Sidebar />
 
       <div className="flex-1 flex flex-col">
-        <Header onSearch={onSearch} />
+        <Header onSearch={handleSearch} />
 
         <main className="p-6 space-y-6">
 
@@ -37,7 +117,7 @@ export default function StaffDashboard({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard
               title="Total Requests"
-              value={totalRequests}
+              value={effectiveTotalRequests}
               subtitle="+12% this month"
               icon={<DocumentTextIcon className="w-6 h-6" />}
               color="bg-teal-100 text-teal-600"
@@ -45,7 +125,7 @@ export default function StaffDashboard({
 
             <StatCard
               title="Approved"
-              value={approvedRequests}
+              value={effectiveApprovedRequests}
               subtitle="90% Success rate"
               icon={<CheckCircleIcon className="w-6 h-6" />}
               color="bg-green-100 text-green-600"
@@ -53,18 +133,19 @@ export default function StaffDashboard({
 
             <StatCard
               title="Pending"
-              value={pendingRequests}
+              value={effectivePendingRequests}
               subtitle="Awaiting review"
               icon={<ClockIcon className="w-6 h-6" />}
               color="bg-yellow-100 text-yellow-600"
             />
           </div>
 
-          <RequestForm onSubmitRequest={onSubmitRequest} />
+          <RequestForm onSubmitRequest={handleSubmitRequest} />
 
           <RequestTable
-            requests={recentRequests}
-            onViewDetails={onViewDetails}
+            requests={filteredRequests}
+            onViewDetails={handleViewDetails}
+            loading={loading}
           />
         </main>
       </div>
@@ -77,7 +158,7 @@ function Sidebar() {
   const location = useLocation();
 
   const navItems = [
-    { name: "Dashboard", icon: HomeIcon, path: "/" },
+    { name: "Dashboard", icon: HomeIcon, path: "/dashboard/operations_staff" },
     { name: "My Requests", icon: ClipboardDocumentListIcon, path: "/staff/myRequests" },
     { name: "History", icon: ClockIcon, path: "/staff/TripHistory" },
     { name: "Profile", icon: UserIcon, path: "/profile" },
@@ -203,9 +284,8 @@ function RequestForm({ onSubmitRequest }) {
   const [form, setForm] = useState({
     purpose: "",
     destination: "",
-    passengers: "",
-    date: "",
-    time: "",
+    departureTime: "",
+    returnTime: "",
   });
 
   const handleChange = (e) => {
@@ -218,6 +298,12 @@ function RequestForm({ onSubmitRequest }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSubmitRequest) onSubmitRequest(form);
+    setForm({
+      purpose: "",
+      destination: "",
+      departureTime: "",
+      returnTime: "",
+    });
   };
 
   return (
@@ -240,6 +326,7 @@ function RequestForm({ onSubmitRequest }) {
             onChange={handleChange}
             placeholder="e.g. Client Site Visit, Team Offsite"
             className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
+            required
           />
         </div>
 
@@ -253,39 +340,31 @@ function RequestForm({ onSubmitRequest }) {
               onChange={handleChange}
               placeholder="Location address"
               className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
+              required
             />
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">Passengers</label>
+            <label className="text-sm text-gray-600">Departure Time</label>
             <input
-              name="passengers"
-              value={form.passengers}
+              type="datetime-local"
+              name="departureTime"
+              value={form.departureTime}
               onChange={handleChange}
-              placeholder="Number of people"
               className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
+              required
             />
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">Date</label>
+            <label className="text-sm text-gray-600">Return Time</label>
             <input
-              type="date"
-              name="date"
-              value={form.date}
+              type="datetime-local"
+              name="returnTime"
+              value={form.returnTime}
               onChange={handleChange}
               className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">Time</label>
-            <input
-              type="time"
-              name="time"
-              value={form.time}
-              onChange={handleChange}
-              className="w-full mt-1 border rounded-lg px-3 py-2 text-sm"
+              required
             />
           </div>
         </div>
@@ -302,12 +381,12 @@ function RequestForm({ onSubmitRequest }) {
 }
 
 /* Request table */
-function RequestTable({ requests, onViewDetails }) {
+function RequestTable({ requests, onViewDetails, loading }) {
 
   const statusStyles = {
-    Pending: "bg-yellow-100 text-yellow-700",
-    Approved: "bg-green-100 text-green-700",
-    Rejected: "bg-red-100 text-red-700",
+    PENDING: "bg-yellow-100 text-yellow-700",
+    APPROVED: "bg-green-100 text-green-700",
+    REJECTED: "bg-red-100 text-red-700",
   };
 
   return (
@@ -332,7 +411,15 @@ function RequestTable({ requests, onViewDetails }) {
 
           <tbody>
 
-            {requests.length === 0 && (
+            {loading && (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-400">
+                  Loading requests...
+                </td>
+              </tr>
+            )}
+
+            {!loading && requests.length === 0 && (
               <tr>
                 <td colSpan="5" className="text-center py-6 text-gray-400">
                   No requests yet
@@ -352,14 +439,18 @@ function RequestTable({ requests, onViewDetails }) {
                 </td>
 
                 <td className="px-6 py-4 text-gray-500">
-                  {req.date}
+                  {req.departureTime
+                    ? new Date(req.departureTime).toLocaleString()
+                    : "-"}
                 </td>
 
                 <td className="px-6 py-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${statusStyles[req.status]}`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      statusStyles[req.status] || "bg-gray-100 text-gray-700"
+                    }`}
                   >
-                    {req.status}
+                    {req.status || "UNKNOWN"}
                   </span>
                 </td>
 

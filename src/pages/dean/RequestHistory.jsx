@@ -1,21 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from "react";
+import { listTripRequests } from "../../api/trips";
+
+function formatDate(value) {
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString();
+}
 
 const RequestHistory = () => {
-  // 1. Initializing with Mock Data so you can see the table immediately
-  const [history, setHistory] = useState([
-    { id: "REQ-001", staff: "John Doe", dest: "Nairobi HQ", date: "2026-03-20", status: "Approved" },
-    { id: "REQ-002", staff: "Jane Smith", dest: "Mombasa Branch", date: "2026-03-22", status: "Pending" },
-    { id: "REQ-003", staff: "Alex Wong", dest: "Kisumu Office", date: "2026-03-24", status: "Cancelled" },
-    { id: "REQ-004", staff: "Sarah Muse", dest: "Nakuru Hub", date: "2026-03-25", status: "Approved" }
-  ]);
-
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 2. Logic to filter data based on the search bar input
-  const filteredHistory = history.filter(item => 
-    item.staff.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    item.dest.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    async function loadHistory() {
+      try {
+        setLoading(true);
+        const data = await listTripRequests();
+        setHistory(Array.isArray(data) ? data : []);
+        setError("");
+      } catch (err) {
+        setError(err.message || "Failed to load request history.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadHistory();
+  }, []);
+
+  const filteredHistory = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    return history.filter((item) => {
+      if (!query) return true;
+      return (
+        String(item.requesterName || "").toLowerCase().includes(query) ||
+        String(item.destination || "").toLowerCase().includes(query)
+      );
+    });
+  }, [history, searchTerm]);
 
   return (
     <div className="history-container">
@@ -27,10 +52,10 @@ const RequestHistory = () => {
       <div className="table-card">
         <div className="table-actions">
           <h3>All Request History</h3>
-          <input 
-            type="text" 
-            placeholder="Search staff or destination..." 
-            className="search-bar" 
+          <input
+            type="text"
+            placeholder="Search staff or destination..."
+            className="search-bar"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -47,34 +72,43 @@ const RequestHistory = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredHistory.length > 0 ? (
-              filteredHistory.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.id}</td>
-                  <td>{item.staff}</td>
-                  <td>{item.dest}</td>
-                  <td>{item.date}</td>
+            {loading ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: "center", padding: "40px", color: "#999" }}>
+                  Loading request history...
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: "center", padding: "40px", color: "#dc2626" }}>
+                  {error}
+                </td>
+              </tr>
+            ) : filteredHistory.length > 0 ? (
+              filteredHistory.map((item) => (
+                <tr key={item.id}>
+                  <td>#{item.id}</td>
+                  <td>{item.requesterName || "Unknown"}</td>
+                  <td>{item.destination || "-"}</td>
+                  <td>{formatDate(item.departureTime)}</td>
                   <td>
-                
-                    <span className={`status-badge ${item.status.toLowerCase()}`}>
-                      ● {item.status}
+                    <span className={`status-badge ${String(item.status || "").toLowerCase()}`}>
+                      ● {item.status || "UNKNOWN"}
                     </span>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                <td colSpan="5" style={{ textAlign: "center", padding: "40px", color: "#999" }}>
                   No records match your search.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-        
-        <div className="table-footer">
-          Showing {filteredHistory.length} historical records
-        </div>
+
+        <div className="table-footer">Showing {filteredHistory.length} historical records</div>
       </div>
     </div>
   );

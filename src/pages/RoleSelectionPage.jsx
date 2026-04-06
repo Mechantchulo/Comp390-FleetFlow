@@ -51,6 +51,7 @@ const RoleCard = ({ title, subtitle, icon, isSelected, onClick }) => {
 const RoleSelectionPage = () => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState("");
+    const isDev = import.meta.env.DEV;
 
     const handleContinue = () => {
         if (!selectedRole) {
@@ -63,7 +64,7 @@ const RoleSelectionPage = () => {
     return (
         <main className="min-h-screen bg-gradient-to-b from-slate-50 to-teal-50 px-4 py-5">
             <div className="mx-auto flex w-full max-w-6xl items-center justify-end">
-                <DevMenu />
+                {isDev && <DevMenu />}
             </div>
 
             <section className="mx-auto mt-20 w-full max-w-4xl">
