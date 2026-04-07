@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Bell, CircleUserRound, LayoutDashboard, LogOut, Map, Search, Settings, Truck } from "lucide-react";
 import { listAssignments } from "../../api/assignments";
@@ -16,41 +16,48 @@ export default function DriverDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [startMileage, setStartMileage] = useState("");
-  const [activeAssignmentId, setActiveAssignmentId] = useState("");
   const [activeTripLogId, setActiveTripLogId] = useState("");
   const [endMileage, setEndMileage] = useState("");
   const [comments, setComments] = useState("");
 
-  useEffect(() => {
-    async function loadAssignments() {
-      try {
-        setLoading(true);
-        const data = await listAssignments();
-        setAssignments(Array.isArray(data) ? data : []);
-        setError("");
-      } catch (err) {
-        setError(err.message || "Failed to load assignments.");
-      } finally {
-        setLoading(false);
-      }
+  async function loadAssignments() {
+    try {
+      setLoading(true);
+      const data = await listAssignments();
+      setAssignments(Array.isArray(data) ? data : []);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Failed to load assignments.");
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     loadAssignments();
   }, []);
 
+  const activeAssignments = useMemo(
+    () => assignments.filter((item) => item.status === "ASSIGNED"),
+    [assignments]
+  );
+  const activeAssignment = activeAssignments[0] || null;
+  const hasMultipleActiveAssignments = activeAssignments.length > 1;
+
   const handleStartTrip = async () => {
-    if (!activeAssignmentId || !startMileage) {
-      window.alert("Select an assignment and provide start mileage.");
+    if (!activeAssignment?.id || !startMileage) {
+      window.alert("No active assignment found. Enter start mileage after assignment.");
       return;
     }
 
     try {
       const created = await startTripLog({
-        assignmentId: Number(activeAssignmentId),
+        assignmentId: Number(activeAssignment.id),
         startMileage: Number(startMileage),
       });
       setActiveTripLogId(String(created.id));
       window.alert(`Trip started. Trip log ID: ${created.id}`);
+      await loadAssignments();
     } catch (err) {
       window.alert(err.message || "Failed to start trip log.");
     }
@@ -68,8 +75,11 @@ export default function DriverDashboard() {
         comments,
       });
       window.alert("Trip ended successfully.");
+      setActiveTripLogId("");
+      setStartMileage("");
       setEndMileage("");
       setComments("");
+      await loadAssignments();
     } catch (err) {
       window.alert(err.message || "Failed to end trip log.");
     }
@@ -153,25 +163,34 @@ export default function DriverDashboard() {
 
           <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5">
             <h3 className="text-lg font-bold mb-4">Trip Log Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm text-slate-600">Assignment</label>
-                <select
-                  value={activeAssignmentId}
-                  onChange={(e) => setActiveAssignmentId(e.target.value)}
-                  className="w-full mt-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-teal-400"
-                >
-                  <option value="">Select assignment</option>
-                  {assignments
-                    .filter((item) => item.status === "ASSIGNED")
-                    .map((item) => (
-                      <option key={item.id} value={item.id}>
-                        #{item.id} - {item.destination || "-"}
-                      </option>
-                    ))}
-                </select>
+            {hasMultipleActiveAssignments && (
+              <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                Multiple active assignments were returned. Showing the first active trip.
               </div>
+            )}
 
+            {!activeAssignment ? (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">
+                You currently have no active trip assignment.
+              </div>
+            ) : (
+              <div className="rounded-xl border border-teal-200 bg-teal-50/50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-teal-700">Current Assigned Trip</p>
+                <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-slate-700 md:grid-cols-2">
+                  <p><span className="font-semibold">Assignment ID:</span> #{activeAssignment.id}</p>
+                  <p><span className="font-semibold">Trip Request:</span> #{activeAssignment.tripRequestId || "-"}</p>
+                  <p><span className="font-semibold">Purpose:</span> {activeAssignment.purpose || "-"}</p>
+                  <p><span className="font-semibold">Destination:</span> {activeAssignment.destination || "-"}</p>
+                  <p><span className="font-semibold">Vehicle:</span> {activeAssignment.vehiclePlateNumber || "-"}</p>
+                  <p><span className="font-semibold">Driver:</span> {activeAssignment.driverName || "-"}</p>
+                  <p><span className="font-semibold">Departure:</span> {formatDate(activeAssignment.departureTime)}</p>
+                  <p><span className="font-semibold">Expected Return:</span> {formatDate(activeAssignment.returnTime)}</p>
+                  <p><span className="font-semibold">Assigned At:</span> {formatDate(activeAssignment.assignedAt)}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-slate-600">Start Mileage</label>
                 <input
@@ -186,7 +205,8 @@ export default function DriverDashboard() {
             <button
               type="button"
               onClick={handleStartTrip}
-              className="mt-4 w-full rounded-full bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-700"
+              disabled={!activeAssignment}
+              className="mt-4 w-full rounded-full bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Start Trip Log
             </button>
