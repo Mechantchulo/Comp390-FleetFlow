@@ -14,6 +14,7 @@ import {
 import { createAssignment, listAssignments } from "../../api/assignments";
 import { listTripRequests } from "../../api/trips";
 import { listAllVehicles } from "../../api/vehicles";
+import { listDrivers } from "../../api/users";
 
 const navItems = [
   { key: "dashboard", label: "Dashboard", icon: Gauge },
@@ -34,16 +35,22 @@ export default function TransportManagerDashboard() {
   const [assignments, setAssignments] = useState([]);
   const [approvedRequests, setApprovedRequests] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [driverLoadError, setDriverLoadError] = useState("");
   const [form, setForm] = useState({ tripRequestId: "", vehicleId: "", driverId: "" });
 
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        const [requestsData, vehiclesData, assignmentsData] = await Promise.all([
+        const [requestsData, vehiclesData, assignmentsData, driversResult] = await Promise.all([
           listTripRequests(),
           listAllVehicles(),
           listAssignments(),
+          listDrivers().then(
+            (data) => ({ ok: true, data }),
+            (error) => ({ ok: false, error })
+          ),
         ]);
 
         setApprovedRequests(
@@ -53,6 +60,22 @@ export default function TransportManagerDashboard() {
         );
         setVehicles(Array.isArray(vehiclesData) ? vehiclesData : []);
         setAssignments(Array.isArray(assignmentsData) ? assignmentsData : []);
+        const loadedDrivers = driversResult.ok && Array.isArray(driversResult.data)
+          ? driversResult.data
+          : [];
+        setDrivers(loadedDrivers);
+
+        if (!driversResult.ok) {
+          setDriverLoadError(
+            driversResult.error?.message
+              ? `Failed to load drivers: ${driversResult.error.message}`
+              : "Failed to load drivers from API. Enter an ID manually if needed."
+          );
+        } else if (loadedDrivers.length === 0) {
+          setDriverLoadError("No drivers returned by API. Enter an ID manually if needed.");
+        } else {
+          setDriverLoadError("");
+        }
         setError("");
       } catch (err) {
         setError(err.message || "Failed to load manager dashboard data.");
@@ -204,13 +227,34 @@ export default function TransportManagerDashboard() {
 
                     <div>
                       <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Driver ID</p>
-                      <input
-                        type="number"
-                        value={form.driverId}
-                        onChange={(e) => setForm((prev) => ({ ...prev, driverId: e.target.value }))}
-                        placeholder="Enter driver user ID"
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-teal-400"
-                      />
+                      {drivers.length > 0 ? (
+                        <select
+                          value={form.driverId}
+                          onChange={(e) => setForm((prev) => ({ ...prev, driverId: e.target.value }))}
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-teal-400"
+                        >
+                          <option value="">Select driver</option>
+                          {drivers.map((driver) => {
+                            const label = driver.fullName || driver.name || driver.email || "Unnamed Driver";
+                            return (
+                              <option key={driver.id} value={driver.id}>
+                                ID {driver.id} - {label}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      ) : (
+                        <input
+                          type="number"
+                          value={form.driverId}
+                          onChange={(e) => setForm((prev) => ({ ...prev, driverId: e.target.value }))}
+                          placeholder="Enter driver user ID"
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-teal-400"
+                        />
+                      )}
+                      {driverLoadError && (
+                        <p className="mt-1 text-xs text-amber-600">{driverLoadError}</p>
+                      )}
                     </div>
                   </div>
 
