@@ -5,6 +5,7 @@ const API_BASE =
   configuredBase || (import.meta.env.DEV ? "http://localhost:8080" : "");
 
 const TOKEN_STORAGE_KEY = "token";
+const ROLE_STORAGE_KEY = "role";
 
 export class ApiError extends Error {
   constructor(status, message, payload) {
@@ -43,8 +44,18 @@ export function setAuthToken(token) {
   localStorage.setItem(TOKEN_STORAGE_KEY, token);
 }
 
+export function getAuthRole() {
+  return localStorage.getItem(ROLE_STORAGE_KEY);
+}
+
+export function setAuthRole(role) {
+  if (!role) return;
+  localStorage.setItem(ROLE_STORAGE_KEY, role);
+}
+
 export function clearAuthToken() {
   localStorage.removeItem(TOKEN_STORAGE_KEY);
+  localStorage.removeItem(ROLE_STORAGE_KEY);
 }
 
 export async function apiRequest(path, options = {}) {

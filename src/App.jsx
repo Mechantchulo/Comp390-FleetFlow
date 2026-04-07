@@ -12,6 +12,7 @@ import PendingRequests from "./pages/dean/PendingRequests";
 import RequestHistory from "./pages/dean/RequestHistory";
 import MyRequests from "./pages/staff/MyRequests";
 import TripHistory from "./pages/staff/TripHistory";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   const location = useLocation();
@@ -39,16 +40,86 @@ export default function App() {
         <Route path="/" element={<RoleSelectionPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/dashboard/transport_manager" element={<TransportManagerDashboard />} />
-        <Route path="/dashboard/admin" element={<AdminDashboard />} />
-        <Route path="/dashboard/operations_staff" element={<StaffDashboard />} />
-        <Route path="/dashboard/department_dean" element={<DeanDashboard />} />
-        <Route path="/dashboard/fleet_driver" element={<DriverDashboard />} />
-        <Route path="/dean/pending" element={<PendingRequests />} />
-        <Route path="/dean/history" element={<RequestHistory />} />
-        <Route path="/dean/profile" element={<ProfilePage />} />
-        <Route path="/staff/myRequests" element={<MyRequests />} />
-        <Route path="/staff/TripHistory" element={<TripHistory />} />
+        <Route
+          path="/dashboard/transport_manager"
+          element={
+            <ProtectedRoute allowedRoles={["TRANSPORT_MANAGER"]}>
+              <TransportManagerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/admin"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/operations_staff"
+          element={
+            <ProtectedRoute allowedRoles={["STAFF"]}>
+              <StaffDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/department_dean"
+          element={
+            <ProtectedRoute allowedRoles={["DEAN"]}>
+              <DeanDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/fleet_driver"
+          element={
+            <ProtectedRoute allowedRoles={["DRIVER"]}>
+              <DriverDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dean/pending"
+          element={
+            <ProtectedRoute allowedRoles={["DEAN"]}>
+              <PendingRequests />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dean/history"
+          element={
+            <ProtectedRoute allowedRoles={["DEAN"]}>
+              <RequestHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dean/profile"
+          element={
+            <ProtectedRoute allowedRoles={["DEAN"]}>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/myRequests"
+          element={
+            <ProtectedRoute allowedRoles={["STAFF"]}>
+              <MyRequests />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/TripHistory"
+          element={
+            <ProtectedRoute allowedRoles={["STAFF"]}>
+              <TripHistory />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );
