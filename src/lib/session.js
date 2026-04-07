@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { clearAuthToken, getAuthToken } from "../api/client";
+import { clearAuthToken, getAuthRole, getAuthToken } from "../api/client";
 
 const roleToRoute = {
   ADMIN: "/dashboard/admin",
@@ -41,6 +41,12 @@ export function getCurrentTokenRole() {
   } catch {
     return null;
   }
+}
+
+export function getCurrentSessionRole() {
+  const storedRole = getAuthRole();
+  if (storedRole && storedRole.trim()) return storedRole.trim();
+  return getCurrentTokenRole();
 }
 
 export function getDashboardRouteForRole(role) {
