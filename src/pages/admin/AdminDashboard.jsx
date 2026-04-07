@@ -25,7 +25,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { jsPDF } from "jspdf";
-import { createAssignment, updateAssignmentStatus } from "../../api/assignments";
+import { createAssignment, listAssignments, updateAssignmentStatus } from "../../api/assignments";
 import { getFuelRecordsByVehicle } from "../../api/fuelRecords";
 import { getTripLogById } from "../../api/tripLogs";
 import { approveTripRequest, getTripLogsByTripRequestId, listTripRequests, rejectTripRequest } from "../../api/trips";
@@ -136,9 +136,10 @@ export default function AdminDashboard() {
       setRequestsLoading(true);
 
       try {
-        const [tripRequests, fleetVehicles] = await Promise.all([
+        const [tripRequests, fleetVehicles, assignmentRows] = await Promise.all([
           listTripRequests(),
           listAllVehicles().catch(() => []),
+          listAssignments().catch(() => []),
         ]);
 
         const normalizedRequests = Array.isArray(tripRequests)
@@ -155,17 +156,19 @@ export default function AdminDashboard() {
           : [];
 
         setRequests(normalizedRequests);
-        setTripRows(
-          normalizedRequests.map((request) => ({
-            id: request.id,
-            route: request.destination || "Unknown",
-            state: request.status === "Approved" ? "Ongoing" : request.status === "Declined" ? "Canceled" : "Pending",
-            driver: "Not assigned",
-            vehicle: "Unassigned",
-            eta: "--",
-            delayMins: 0,
-          }))
-        );
+        const normalizedAssignments = Array.isArray(assignmentRows)
+          ? assignmentRows.map((assignment) => ({
+              id: assignment.id ? String(assignment.id) : "N/A",
+              tripRequestId: assignment.tripRequestId ? String(assignment.tripRequestId) : "",
+              route: assignment.destination || "Unknown",
+              state: normalizeAssignmentState(assignment.status),
+              driver: assignment.driverName || (assignment.driverId ? `ID ${assignment.driverId}` : "Not assigned"),
+              vehicle: assignment.vehiclePlateNumber || "Unassigned",
+              eta: assignment.returnTime || "--",
+              delayMins: Number(assignment.delayMins || 0),
+            }))
+          : [];
+        setTripRows(normalizedAssignments);
 
         const normalizedVehicles = Array.isArray(fleetVehicles)
           ? fleetVehicles.map((vehicle) => ({
@@ -403,8 +406,9 @@ export default function AdminDashboard() {
     setActiveTab("incidents");
     setInvestigatedTrip(trip.id);
     try {
+      const tripRequestId = trip.tripRequestId || trip.id;
       const [tripLogs, singleLog] = await Promise.all([
-        getTripLogsByTripRequestId(trip.id).catch(() => []),
+        getTripLogsByTripRequestId(tripRequestId).catch(() => []),
         getTripLogById(trip.id).catch(() => null),
       ]);
       const totalLogs = (Array.isArray(tripLogs) ? tripLogs.length : 0) + (singleLog ? 1 : 0);
@@ -1314,6 +1318,15 @@ function normalizeTripStatus(status) {
   if (normalized === "APPROVED") return "Approved";
   if (normalized === "REJECTED") return "Declined";
   if (normalized === "ASSIGNED") return "Assigned";
+  if (normalized === "PENDING") return "Pending";
+  return status ? String(status) : "Pending";
+}
+
+function normalizeAssignmentState(status) {
+  const normalized = String(status || "").toUpperCase();
+  if (normalized === "ASSIGNED") return "Ongoing";
+  if (normalized === "COMPLETED") return "Completed";
+  if (normalized === "CANCELLED" || normalized === "CANCELED") return "Canceled";
   if (normalized === "PENDING") return "Pending";
   return status ? String(status) : "Pending";
 }
